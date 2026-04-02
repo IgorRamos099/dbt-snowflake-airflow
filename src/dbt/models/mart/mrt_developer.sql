@@ -5,7 +5,7 @@ select
     description,
     count(*) as qtd_developer
 from 
-    {{ ref('prepped_developer') }}
+    {{ ref('int_prepped_developer') }}
 group by
     id,name,description
 )

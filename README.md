@@ -1,216 +1,119 @@
-# Engenharia de Dados com Apache Airflow, Snowflake e dbt
-Repositório do projeto "Engenharia de Dados com Apache Airflow, Snowflake e dbt". Este projeto é baseado no seguinte Guia Snowflake para engenharia de dados com Apache Airflow, Snowflake e dbt.
+Engenharia de Dados com dbt, Snowflake e Apache Airflow
+Projeto de engenharia de dados integrando dbt, Snowflake e Apache Airflow para ingestão, transformação e orquestração de dados em ambiente cloud.
 
-Vale ressaltar que esse repo foi criado usando como base o repo abaixo:
+Arquitetura
+CSV (Seeds) → dbt → Snowflake → Docker (imagem dbt) → Airflow (orquestração)
 
-```
-https://github.com/jacob-mennell/snowflakeAirflowDBT
-```
+Tecnologias utilizadas
 
-## Vídeo tutorial
-
-Link: https://youtu.be/mBrk5hvqc84
-
-## Passo a passo contido neste repo:
-Passo 1: Criar a conta no Snowflake 
-
-Passo 2: Instalar o Docker
-
-Passo 3: Conectar o dbt no Snowflake
-
-Passo 4: Ingerir arquivo CSV no Snowflake com o dbt
-
-Passo 5: Crie a imagem do dbt em um container
-
-Passo 6: Orquestrar o container do dbt conectado ao Snowflake com o Airflow
-
-## Siga as instruções abaixo para conseguir realizar todos os passos
+Python 3.13
+dbt 1.11.7 com adapter Snowflake
+Snowflake (cloud data warehouse)
+Apache Airflow 2.10.0
+Docker
 
 
-## Arquitetura
-![image](assets/architecture-dbt-snowflake-airflow.png)
+Pré-requisitos
 
-## Introdução
-
-### Snowflake
-
-O Snowflake, uma plataforma de Data Cloud, fornece uma solução inovadora que simplifica pipelines de dados, permitindo que você foque mais em dados e análises do que na gestão de infraestrutura. Ele simplifica o armazenamento, processamento e computação quando comparado a soluções tradicionais.
-
-### Airflow
-
-O Apache Airflow é uma plataforma de gerenciamento de fluxo de trabalho de código aberto que permite criar e gerenciar pipelines de dados de forma eficiente usando grafos acíclicos direcionados (DAGs) de tarefas.
-
-### Docker
-
-O Docker é utilizado neste projeto para executar o Apache Airflow e, posteriormente, o dbt em um contêiner, tornando a configuração e a portabilidade mais fáceis.
-
-### dbt
-
-O dbt (data build tool) é uma ferramenta de linha de comando de código aberto que permite que analistas e engenheiros de dados transformem dados em seu data warehouse de forma mais eficiente. Ele segue uma abordagem modular e versionada para transformação de dados, permitindo que equipes construam, mantenham e documentem pipelines de dados de forma colaborativa.
-
-dbt simplifica o processo de escrita de código SQL, organizando-o em modelos estruturados e gerenciando dependências. Ele ganhou popularidade em arquiteturas modernas de dados, especialmente quando integrado a plataformas em nuvem como Snowflake.
-
-O dbt CLI é uma interface de linha de comando versátil que facilita a gestão de projetos dbt.
-
-## Requisitos Prévios
-
-O projeto requer os seguintes elementos:
-
-* Docker
-
-* Python >=3
-
-* Uma conta Snowflake.
-
-* Um usuário Snowflake com permissões necessárias, incluindo a capacidade de criar objetos no banco de dados DEMO_DB.
-
-### Como instalar o Docker?
-https://www.youtube.com/watch?v=pRFzDVn40rw&list=PLbPvnlmz6e_L_3Zw_fGtMcMY0eAOZnN-H
-
-### Como criar um conta no Snowflake?
-https://www.snowflake.com/en/emea/
-
-### Como criar o user com permissões?
-Entre na pasta ```scripts``` e use o arquivo ```snowflake-setup.sql``` como base.
-
-### Como utilizar o projeto?
-Faça clone com o comando:
-```
-git clone https://github.com/wlcamargo/dbt-snowflake-airflow.git
-```
-Entre na pasta do projeto
-```
-cd dbt-snowflake-airflow
-```
-Rode o container do Airflow com o comando:
-```
-cd airflow
-docker compose up -d
-```
-Resultado esperado:
-
-![image](assets/ariflow-ok.png)
+Python >= 3.8
+Docker Desktop instalado e em execução
+Conta no Snowflake
+Git
 
 
-## Como acessar o Airflow?
-Digite no navegador:
-```
-localhost:8081
-```
+Como configurar o projeto
+1. Clone o repositório
+bashgit clone https://github.com/SEU_USUARIO/NOME_DO_REPO.git
+cd NOME_DO_REPO
+2. Crie e ative o ambiente virtual
+bashpython -m venv venv
 
----------------------------------------------
+# Windows
+venv\Scripts\activate
 
-Exemplo Airflow UI:
-
-![image](assets/sample-airflow-ui.png)
-
----------------------------------------------
-
-## Credenciais do Airlflow
-
-username: airflow
-
-password: airflow
-
----------------------------------------------
-
-## Como instalar o dbt?
-### Crie o ambiente virtual
-```
-python3 -m venv venv
-```
-
-### Ative o ambiente virtual (Linux)
-```
+# Linux/Mac
 source venv/bin/activate
-```
+3. Instale as dependências
+bashpip install -r requirements.txt
 
-### Ative o ambiente virtual (Windows)
-```
-venv/Scripts/Activate
-```
+Configuração do Snowflake
+Execute o script de setup no Snowflake para criar os objetos necessários:
+sql-- Disponível em scripts/snowflake-setup.sql
+O script cria:
 
-### No ambiente virtual ativo instale as libs
-```
-pip install -r requirements.txt
-```
-
-## Como verificar se o dbt foi instalado?
-```
-dbt --version
-```
-
-Resultado esperado:
-
-![image](assets/dbt-ok.png)
+Database: DBT_DEV_DB
+Schema: JM
+Role: DBT_ROLE
+User: DBT_USER
+Warehouse: DBT_WH
 
 
-## Como configurar o dbt para conectar no Snowflake?
-Entre na pasta ```src/dbt``` e altere o nome do arquivo ```example_profiles.yml``` para ```profiles.yml```
-
-Altere o ```account: your-account``` para sua conta do Snowflake
-
-Para verificar se a conexão está ok, use o comando:
-```
-cd src/dbt
+Configuração do dbt
+1. Configure o profiles.yml
+Entre na pasta src/dbt e renomeie o arquivo example_profiles.yml para profiles.yml.
+Edite o arquivo e informe o account da sua conta Snowflake. Para encontrar o account, acesse a URL do Snowflake no navegador:
+https://app.snowflake.com/nnrdzqp/ip80242/...
+                           ^^^^^^^^^^^^^^^^
+                           nnrdzqp-ip80242 ← esse é o account
+2. Verifique a conexão
+bashcd src/dbt
 dbt debug
-```
 
-Resultado esperado:
-
-![image](assets/connection-dbt-snow-ok.png)
-
-## Como ingerir dados no dbt?
-Use o comando abaixo:
-```
-cd src/dbt
+Ingestão de dados com dbt seed
+bashcd src/dbt
 dbt seed
-```
+Seeds carregados:
 
-Resultado esperado:
+bookings_1
+bookings_2
+customers
+tb_developer
 
-![image](assets/dbt-seed.png)
 
-## Como criar a imagem Docker do dbt?
-```
-cd src
+Modelos dbt
+Os modelos estão organizados em camadas:
+CamadaModelosintermediateint_combined_bookings, int_customer, int_prepped_data, int_prepped_developermartmrt_developer, mrt_hotel_count_by_day, mrt_thirty_day_avg_cost
+Para executar:
+bashdbt run
+
+Build da imagem Docker do dbt
+bashcd src
 docker build -t dbt-snowflake .
-```
 
-## Como entrar no container do dbt?
-```
-docker run -it dbt-snowflake /bin/bash
-```
+Subindo o Airflow
+bashcd airflow
+docker-compose up
+Acesse: http://localhost:8081
+Credenciais:
 
-## Como orquestrar a dag do Airflow?
-A Dag já está criada, basta fazer o disparo. Exemplo:
-
-![image](assets/dag-sample.png)
-
-## Tabelas no Snowflake
-Tabelas ingeridas a partir dos arquivos CSV
-
-![image](assets/tables.png)
-
-As tabelas processadas pelo dbt, foram materializadas como views, conforme exemplo:
-
-![image](assets/transformed_table_snowflake.png)
+Usuário: airflow
+Senha: airflow
 
 
-## Conclusão
-Se você chegou até aqui, parabéns! Já tens um projeto de exemplo para orquestrar o dbt conectado no Snowflake com o Airflow.
+DAG de orquestração
+A DAG dbt-snowflake-process orquestra a execução dos modelos dbt via Docker, com schedule @hourly.
+Tasks:
+
+run_transformn — executa os modelos de transformação
+run_analysis — executa os modelos de análise
 
 
-## 📚 Referências
-
-- [Repo usado como base](https://github.com/jacob-mennell/snowflakeAirflowDBT)
-
-- [Exploring dbt with Snowflake](https://www.entechlog.com/blog/kafka/exploring-dbt-with-snowflake/)
-
-- [Snowflake Guide: Data Engineering with Apache Airflow](https://quickstarts.snowflake.com/guide/data_engineering_with_apache_airflow/index.html)
-
-
-## Developer
-| Desenvolvedor      | LinkedIn                                   | Email                        | Portfólio                              |
-|--------------------|--------------------------------------------|------------------------------|----------------------------------------|
-| Wallace Camargo    | [LinkedIn](https://www.linkedin.com/in/wallace-camargo-35b615171/) | wallacecpdg@gmail.com        | [Portfólio](https://wlcamargo.github.io/)   |
+Estrutura do projeto
+dbt-airflow/
+├── airflow/
+│   ├── dags/
+│   ├── docker-compose.yaml
+│   └── .env
+├── src/
+│   └── dbt/
+│       ├── models/
+│       │   ├── intermediate/
+│       │   └── mart/
+│       ├── seeds/
+│       ├── macros/
+│       ├── dbt_project.yml
+│       └── profiles.yml
+├── scripts/
+│   └── snowflake-setup.sql
+├── requirements.txt
+└── README.md

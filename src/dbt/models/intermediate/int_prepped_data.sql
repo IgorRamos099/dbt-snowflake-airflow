@@ -6,6 +6,6 @@ SELECT A.ID
     , HOTEL
     , BOOKING_DATE
     , COST
-FROM {{ref('customer')}}  A
-JOIN {{ref('combined_bookings')}} B
+FROM {{ref('int_customer')}}  A
+JOIN {{ref('int_combined_bookings')}} B
 on A.ID = B.ID
